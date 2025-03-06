@@ -118,7 +118,7 @@ public class MavenProjectCacheTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource("/modules").toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Test add folders
 		workspaceService.didChangeWorkspaceFolders(
@@ -144,7 +144,7 @@ public class MavenProjectCacheTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource("/modules").toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Add folders
 		workspaceService.didChangeWorkspaceFolders(

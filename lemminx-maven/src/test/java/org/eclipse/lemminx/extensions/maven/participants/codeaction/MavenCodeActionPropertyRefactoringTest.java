@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -254,7 +255,7 @@ public class MavenCodeActionPropertyRefactoringTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource("/property-refactoring/child").toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(

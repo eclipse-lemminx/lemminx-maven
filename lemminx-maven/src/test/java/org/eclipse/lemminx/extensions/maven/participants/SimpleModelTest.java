@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -388,7 +389,7 @@ public class SimpleModelTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource("/modules").toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -461,7 +462,7 @@ public class SimpleModelTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource("/modules").toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -530,7 +531,7 @@ public class SimpleModelTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource("/modules").toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -560,7 +561,7 @@ public class SimpleModelTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource("/modules").toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -589,7 +590,7 @@ public class SimpleModelTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource("/modules").toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -624,7 +625,7 @@ public class SimpleModelTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource("/modules").toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -759,9 +760,14 @@ public class SimpleModelTest {
 	public void testParentAsWorkspaceFolderInInitializeParam() throws Exception {
 		InitializeParams params = new InitializeParams();
 		String childFolder = "/parentAsSiblingProjectWithoutRelativePath/child";
+		String parentFolder = "/parentAsSiblingProjectWithoutRelativePath/parent";
+		
+		URI childFolderUri = MavenLemminxTestsUtils.class.getResource(childFolder).toURI();
+		URI parentFolderUri = MavenLemminxTestsUtils.class.getResource(parentFolder).toURI();
+
 		params.setWorkspaceFolders(List.of(
-				new WorkspaceFolder(MavenLemminxTestsUtils.class.getResource(childFolder).toURI().toString()),
-				new WorkspaceFolder(MavenLemminxTestsUtils.class.getResource("/parentAsSiblingProjectWithoutRelativePath/parent").toURI().toString())));
+				new WorkspaceFolder(childFolderUri.toString(), new File(childFolderUri.getPath()).getName()),
+				new WorkspaceFolder(parentFolderUri.toString(), new File(parentFolderUri.getPath()).getName())));
 		languageService.initializeParams(params);
 
 		DOMDocument document = createDOMDocument(childFolder + "/pom.xml", languageService);

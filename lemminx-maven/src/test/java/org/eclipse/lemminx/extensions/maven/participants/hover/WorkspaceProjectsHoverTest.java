@@ -107,7 +107,7 @@ public class WorkspaceProjectsHoverTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource(WORKSPACE_PATH).toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -150,7 +150,7 @@ public class WorkspaceProjectsHoverTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource(WORKSPACE_PATH).toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -193,7 +193,7 @@ public class WorkspaceProjectsHoverTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource(WORKSPACE_PATH).toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -236,7 +236,7 @@ public class WorkspaceProjectsHoverTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource(WORKSPACE_PATH).toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 	
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -279,7 +279,7 @@ public class WorkspaceProjectsHoverTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource(WORKSPACE_PATH).toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 	
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -326,7 +326,7 @@ public class WorkspaceProjectsHoverTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource(WORKSPACE_PATH).toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 	
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -392,7 +392,7 @@ public class WorkspaceProjectsHoverTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource(WORKSPACE_PATH).toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 	
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -457,7 +457,7 @@ public class WorkspaceProjectsHoverTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource(WORKSPACE_PATH).toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 	
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
@@ -530,7 +530,7 @@ public class WorkspaceProjectsHoverTest {
 		assertNotNull(workspaceService);
 		
 		URI folderUri = getClass().getResource(WORKSPACE_PATH).toURI();
-		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString());
+		WorkspaceFolder wsFolder = new WorkspaceFolder(folderUri.toString(), new File(folderUri.getPath()).getName());
 	
 		// Add folders to MavenProjectCache
 		workspaceService.didChangeWorkspaceFolders(
