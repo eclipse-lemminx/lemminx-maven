@@ -7,7 +7,7 @@
 	<artifactId>lemminx-maven</artifactId>
   <!-- Versioning rule: Go for +0.0.1 on each release, unless using a new version of 
        lemminx which is not backward compatible, in such case, go for +0.1.0 -->
-	<version>0.11.2-SNAPSHOT</version>
+	<version>0.12.0-SNAPSHOT</version>
 
 	<licenses>
 		<license>
