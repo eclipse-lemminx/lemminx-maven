@@ -23,7 +23,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<lemminx.maven.indexDirectory>${project.build.directory}/test-index</lemminx.maven.indexDirectory>
 		<maven.repo.local>${settings.localRepository}</maven.repo.local>
-		<junit-jupiter.version>5.13.2</junit-jupiter.version>
+		<junit-jupiter.version>5.13.3</junit-jupiter.version>
 		<lemminx.version>0.31.0</lemminx.version>
 		<maven.version>3.9.10</maven.version>
 		<maven-resolver.version>1.9.24</maven-resolver.version>
