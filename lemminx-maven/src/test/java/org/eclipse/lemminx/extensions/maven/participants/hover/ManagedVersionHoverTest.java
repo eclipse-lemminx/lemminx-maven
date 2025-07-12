@@ -172,7 +172,7 @@ class ManagedVersionHoverTest {
         System.out.println("Hover Text: [" + value + "]");
         assertNotNull(value);
         assertTrue(value.contains("The managed version is"));
-        assertTrue(value.contains("3.12.0"));
+        assertTrue(value.contains("3.18.0"));
         assertTrue(value.contains("The artifact is managed in"));
         assertTrue(value.contains("org.eclipse.test:bom-import-parent:1.0.0"));
         assertTrue(value.contains("eclipse-bom-tester/parent/pom.xml"));
