@@ -16,7 +16,7 @@
     
     <properties>
         <payara-version>5.2022.3</payara-version>
-        <commons-lang3-version>3.12.0</commons-lang3-version>
+        <commons-lang3-version>3.18.0</commons-lang3-version>
     </properties>
 
     <dependencyManagement>
