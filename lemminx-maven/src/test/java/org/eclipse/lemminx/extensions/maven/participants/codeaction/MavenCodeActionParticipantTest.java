@@ -113,7 +113,7 @@ public class MavenCodeActionParticipantTest {
 	
 		Diagnostic expectedDiagnostic = d(17, 15, 17, 21, 
 				MavenSyntaxErrorCode.OverridingOfManagedDependency,
-				"Overriding managed version 3.12.0 for commons-lang3");
+				"Overriding managed version 3.18.0 for commons-lang3");
 		
 		// Fake location for managed version 
 		Map<String, String> data = new HashMap<>();
@@ -144,7 +144,7 @@ public class MavenCodeActionParticipantTest {
 
 		Diagnostic expectedDiagnostic = d(17, 15, 17, 21, 
 				MavenSyntaxErrorCode.OverridingOfManagedDependency,
-				"Duplicating managed version 3.12.0 for commons-lang3");
+				"Duplicating managed version 3.18.0 for commons-lang3");
 		
 		// Fake location for managed version 
 		Map<String, String> data = new HashMap<>();
