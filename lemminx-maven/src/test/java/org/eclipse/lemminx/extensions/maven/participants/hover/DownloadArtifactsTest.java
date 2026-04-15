@@ -77,9 +77,9 @@ public class DownloadArtifactsTest {
 	public void testDownloadArtifactOnHover()
 			throws IOException, InterruptedException, URISyntaxException {
 		File artifactDirectory = new File(mavenRepo, "org/glassfish/jersey/project/2.19");
+		assertFalse(artifactDirectory.exists());
 		final DOMDocument document = createDOMDocument("/pom-remote-artifact-download-hover.xml");
 		final Position position = new Position(14, 18);
-		assertFalse(artifactDirectory.exists());
 		Hover hover;
 		do {
 			hover = languageService.doHover(document, position, new SharedSettings());
@@ -95,9 +95,9 @@ public class DownloadArtifactsTest {
 	public void testDownloadNonCentralArtifactOnHover()
 			throws IOException, URISyntaxException {
 		File artifactDirectory = new File(mavenRepo, "com/github/goxr3plus/java-stream-player/9.0.4");
+		assertFalse(artifactDirectory.exists());
 		final DOMDocument document = createDOMDocument("/pom-remote-artifact-non-central-download-hover.xml");
 		final Position position = new Position(14, 20);
-		assertFalse(artifactDirectory.exists());
 		languageService.doHover(document, position, new SharedSettings());
 
 		assertTrue(artifactDirectory.exists());
