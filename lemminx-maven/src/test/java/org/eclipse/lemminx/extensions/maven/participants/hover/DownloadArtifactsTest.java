@@ -8,8 +8,10 @@
  *******************************************************************************/
 package org.eclipse.lemminx.extensions.maven.participants.hover;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsArrayWithSize.emptyArray;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.io.FileMatchers.anExistingDirectory;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,7 +79,7 @@ public class DownloadArtifactsTest {
 	public void testDownloadArtifactOnHover()
 			throws IOException, InterruptedException, URISyntaxException {
 		File artifactDirectory = new File(mavenRepo, "org/glassfish/jersey/project/2.19");
-		assertFalse(artifactDirectory.exists());
+		assertThat(artifactDirectory, not(anExistingDirectory()));
 		final DOMDocument document = createDOMDocument("/pom-remote-artifact-download-hover.xml");
 		final Position position = new Position(14, 18);
 		Hover hover;
@@ -86,8 +88,8 @@ public class DownloadArtifactsTest {
 			Thread.sleep(500);
 		} while (hover == null);
 
-		assertTrue(artifactDirectory.exists());
-		assertTrue(artifactDirectory.listFiles().length > 0);
+		assertThat(artifactDirectory, anExistingDirectory());
+		assertThat(artifactDirectory.listFiles(), not(emptyArray()));
 	}
 
 	@Test
@@ -95,13 +97,13 @@ public class DownloadArtifactsTest {
 	public void testDownloadNonCentralArtifactOnHover()
 			throws IOException, URISyntaxException {
 		File artifactDirectory = new File(mavenRepo, "com/github/goxr3plus/java-stream-player/9.0.4");
-		assertFalse(artifactDirectory.exists());
+		assertThat(artifactDirectory, not(anExistingDirectory()));
 		final DOMDocument document = createDOMDocument("/pom-remote-artifact-non-central-download-hover.xml");
 		final Position position = new Position(14, 20);
 		languageService.doHover(document, position, new SharedSettings());
 
-		assertTrue(artifactDirectory.exists());
-		assertTrue(artifactDirectory.listFiles().length > 0);
+		assertThat(artifactDirectory, anExistingDirectory());
+		assertThat(artifactDirectory.listFiles(), not(emptyArray()));
 	}
 
 }
