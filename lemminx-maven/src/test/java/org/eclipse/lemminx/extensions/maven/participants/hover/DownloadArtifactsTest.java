@@ -41,6 +41,7 @@ public class DownloadArtifactsTest {
 	@BeforeEach
 	public void setUp() throws IOException {
 		languageService = new MavenLanguageService();
+		languageService.initializeIfNeeded();
 	}
 
 	@AfterEach
@@ -62,7 +63,6 @@ public class DownloadArtifactsTest {
 	@Timeout(value = 60, unit = TimeUnit.SECONDS)
 	public void testDownloadArtifactOnHover()
 			throws IOException, InterruptedException, URISyntaxException {
-		languageService.initializeIfNeeded();
 		File mavenRepo = languageService.getExtensions().stream() //
 				.filter(MavenLemminxExtension.class::isInstance) //
 				.map(MavenLemminxExtension.class::cast) //
@@ -88,7 +88,6 @@ public class DownloadArtifactsTest {
 	@Timeout(15000)
 	public void testDownloadNonCentralArtifactOnHover()
 			throws IOException, URISyntaxException {
-		languageService.initializeIfNeeded();
 		File mavenRepo = languageService.getExtensions().stream() //
 				.filter(MavenLemminxExtension.class::isInstance) //
 				.map(MavenLemminxExtension.class::cast) //
