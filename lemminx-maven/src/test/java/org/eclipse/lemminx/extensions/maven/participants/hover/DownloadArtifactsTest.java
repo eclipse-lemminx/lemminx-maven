@@ -18,6 +18,9 @@ import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.maven.execution.MavenSession;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.extensions.maven.MavenLanguageService;
 import org.eclipse.lemminx.extensions.maven.MavenLemminxExtension;
@@ -37,11 +40,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class DownloadArtifactsTest {
 
 	private XMLLanguageService languageService;
+	private File mavenRepo;
 
 	@BeforeEach
 	public void setUp() throws IOException {
 		languageService = new MavenLanguageService();
 		languageService.initializeIfNeeded();
+		mavenRepo = languageService.getExtensions().stream() //
+				.filter(MavenLemminxExtension.class::isInstance) //
+				.map(MavenLemminxExtension.class::cast) //
+				.findAny() //
+				.map(MavenLemminxExtension::getMavenSession) //
+				.map(MavenSession::getRepositorySession) //
+				.map(RepositorySystemSession::getLocalRepository) //
+				.map(LocalRepository::getBasedir) //
+				.get();
 	}
 
 	@AfterEach
@@ -63,13 +76,6 @@ public class DownloadArtifactsTest {
 	@Timeout(value = 60, unit = TimeUnit.SECONDS)
 	public void testDownloadArtifactOnHover()
 			throws IOException, InterruptedException, URISyntaxException {
-		File mavenRepo = languageService.getExtensions().stream() //
-				.filter(MavenLemminxExtension.class::isInstance) //
-				.map(MavenLemminxExtension.class::cast) //
-				.findAny() //
-				.map(mavenLemminxPlugin -> mavenLemminxPlugin.getMavenSession().getRepositorySession()
-						.getLocalRepository().getBasedir())
-				.get();
 		File artifactDirectory = new File(mavenRepo, "org/glassfish/jersey/project/2.19");
 		final DOMDocument document = createDOMDocument("/pom-remote-artifact-download-hover.xml");
 		final Position position = new Position(14, 18);
@@ -88,14 +94,6 @@ public class DownloadArtifactsTest {
 	@Timeout(15000)
 	public void testDownloadNonCentralArtifactOnHover()
 			throws IOException, URISyntaxException {
-		File mavenRepo = languageService.getExtensions().stream() //
-				.filter(MavenLemminxExtension.class::isInstance) //
-				.map(MavenLemminxExtension.class::cast) //
-				.findAny() //
-				.map(mavenLemminxPlugin -> mavenLemminxPlugin.getMavenSession().getRepositorySession()
-						.getLocalRepository().getBasedir())
-				.get();
-
 		File artifactDirectory = new File(mavenRepo, "com/github/goxr3plus/java-stream-player/9.0.4");
 		final DOMDocument document = createDOMDocument("/pom-remote-artifact-non-central-download-hover.xml");
 		final Position position = new Position(14, 20);
