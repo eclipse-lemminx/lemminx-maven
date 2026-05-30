@@ -24,7 +24,7 @@
 		<lemminx.maven.indexDirectory>${project.build.directory}/test-index</lemminx.maven.indexDirectory>
 		<maven.repo.local>${settings.localRepository}</maven.repo.local>
 		<junit-jupiter.version>6.0.3</junit-jupiter.version>
-		<lemminx.version>0.31.0</lemminx.version>
+		<lemminx.version>0.31.1</lemminx.version>
 		<maven.version>3.9.14</maven.version>
 		<maven-resolver.version>1.9.25</maven-resolver.version>
 	</properties>
