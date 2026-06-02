@@ -164,7 +164,8 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 	private IXMLDocumentProvider documentProvider;
 	private IXMLValidationService validationService;
 
-	private ProgressSupport progressSupport;
+	// for o.e.l.e.maven.InitMavenRequestTest - it doesn't call start method
+	private ProgressSupport progressSupport = new NoopProgressSupport();
 
 	@Override
 	public void doSave(ISaveContext context) {
@@ -198,7 +199,7 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 		}
 		this.currentRegistry = registry;
 		this.resolverExtensionManager = registry.getResolverExtensionManager();
-		this.progressSupport = registry.getProgressSupport();
+		this.progressSupport = Optional.ofNullable(registry.getProgressSupport()).orElse(new NoopProgressSupport());
 		this.documentProvider = registry.getDocumentProvider();
 		this.validationService = registry.getValidationService();
 		try {
@@ -267,11 +268,9 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 
 	private void doInitialize(CancelChecker cancelChecker) {
 		Exception error = null;
-		ProgressMonitor progressMonitor = progressSupport != null ? progressSupport.createProgressMonitor() : null;
+		ProgressMonitor progressMonitor = Optional.ofNullable(progressSupport.createProgressMonitor()).orElse(new NoopProgressSupport().createProgressMonitor());
 		try {
-			if (progressMonitor != null) {
-				progressMonitor.begin("Loading Maven components...", "", 100, null);
-			}
+			progressMonitor.begin("Loading Maven components...", "", 100, null);
 			boolean skipCentralRepository = settings.getCentral().isSkip();
 			int nbSteps = 7 - (skipCentralRepository ? 1 : 0);
 			int currentStep = 1;
@@ -279,33 +278,27 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 
 			// Step1 : initialize Plexus container
 			cancelChecker.checkCanceled();
-			if (progressMonitor != null) {
-				progressMonitor.report("Initializing Plexus container" + getStepMessage(currentStep, nbSteps) + "...",
-						percentage, null);
-			}
+			progressMonitor.report("Initializing Plexus container" + getStepMessage(currentStep, nbSteps) + "...",
+				percentage, null);
 			this.container = newPlexusContainer();
 
 			// Step2 : initialize Maven request
 			cancelChecker.checkCanceled();
-			if (progressMonitor != null) {
-				currentStep++;
-				percentage += 15;
-				progressMonitor.report("Initializing Maven request" + getStepMessage(currentStep, nbSteps) + "...",
-						percentage, null);
-			}
+			currentStep++;
+			percentage += 15;
+			progressMonitor.report("Initializing Maven request" + getStepMessage(currentStep, nbSteps) + "...",
+					percentage, null);
 			// Get the real local repository of the user
 			// Initialize maven request
 			mavenRequest = initMavenRequest(container, settings);
 			List<File> localRepositoryDirs = LocalRepositoryUtils.getLocalRepositoryPaths(mavenRequest);
 			// Step3 : initialize Repository system session
 			cancelChecker.checkCanceled();
-			if (progressMonitor != null) {
-				currentStep++;
-				percentage += 15;
-				progressMonitor.report(
-						"Initializing Repository system session" + getStepMessage(currentStep, nbSteps) + "...",
-						percentage, null);
-			}
+			currentStep++;
+			percentage += 15;
+			progressMonitor.report(
+					"Initializing Repository system session" + getStepMessage(currentStep, nbSteps) + "...",
+					percentage, null);
 
 			DefaultRepositorySystemSessionFactory repositorySessionFactory = container
 					.lookup(DefaultRepositorySystemSessionFactory.class);
@@ -314,12 +307,10 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 
 			// Step4 : initialize Maven session
 			cancelChecker.checkCanceled();
-			if (progressMonitor != null) {
-				currentStep++;
-				percentage += 15;
-				progressMonitor.report("Initializing Maven session" + getStepMessage(currentStep, nbSteps) + "...",
-						percentage, null);
-			}
+			currentStep++;
+			percentage += 15;
+			progressMonitor.report("Initializing Maven session" + getStepMessage(currentStep, nbSteps) + "...",
+					percentage, null);
 			MavenExecutionResult mavenResult = new DefaultMavenExecutionResult();
 			// TODO: MavenSession is deprecated. Investigate for alternative
 			mavenSession = new MavenSession(container, repositorySystemSession, mavenRequest, mavenResult);
@@ -327,13 +318,11 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 
 			// Step5 : create local repository searcher
 			cancelChecker.checkCanceled();
-			if (progressMonitor != null) {
-				currentStep++;
-				percentage += 15;
-				progressMonitor.report(
-						"Creating local repository searcher" + getStepMessage(currentStep, nbSteps) + "...", percentage,
-						null);
-			}
+			currentStep++;
+			percentage += 15;
+			progressMonitor.report(
+					"Creating local repository searcher" + getStepMessage(currentStep, nbSteps) + "...", percentage,
+					null);
 			Set<File> dirs = new HashSet<>(localRepositoryDirs);
 			dirs.add(mavenRequest.getLocalRepositoryPath());
 			localRepositorySearcher = new LocalRepositorySearcher(dirs, progressSupport);
@@ -342,13 +331,11 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 			if (!skipCentralRepository) {
 				// Step6 : create central repository searcher
 				cancelChecker.checkCanceled();
-				if (progressMonitor != null) {
-					currentStep++;
-					percentage += 15;
-					progressMonitor.report(
-							"Creating central repository searcher" + getStepMessage(currentStep, nbSteps) + "...",
-							percentage, null);
-				}
+				currentStep++;
+				percentage += 15;
+				progressMonitor.report(
+						"Creating central repository searcher" + getStepMessage(currentStep, nbSteps) + "...",
+						percentage, null);
 				centralSearcher = new RemoteCentralRepositorySearcher();
 			}
 			buildPluginManager = null;
@@ -357,12 +344,10 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 
 			// Step7 : initializing Workspace readers
 			cancelChecker.checkCanceled();
-			if (progressMonitor != null) {
-				currentStep++;
-				percentage += 15;
-				progressMonitor.report("Initializing Workspace readers" + getStepMessage(currentStep, nbSteps) + "...",
-						percentage, null);
-			}
+			currentStep++;
+			percentage += 15;
+			progressMonitor.report("Initializing Workspace readers" + getStepMessage(currentStep, nbSteps) + "...",
+					percentage, null);
 			internalDidChangeWorkspaceFolders(this.initialWorkspaceFolders.stream().map(WorkspaceFolder::getUri)
 					.map(URI::create).toArray(URI[]::new), null);
 		} catch (Exception e) {
@@ -370,11 +355,9 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			stop(currentRegistry);
 		} finally {
-			if (progressMonitor != null) {
-				String message = error != null ? "Maven initialization terminated with error " + error.getMessage()
-						: "Maven initialization done";
-				progressMonitor.end(message);
-			}
+			String message = error != null ? "Maven initialization terminated with error " + error.getMessage()
+				: "Maven initialization done";
+			progressMonitor.end(message);
 		}
 	}
 
