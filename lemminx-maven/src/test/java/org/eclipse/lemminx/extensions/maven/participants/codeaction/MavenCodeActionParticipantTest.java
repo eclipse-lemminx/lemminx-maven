@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.lemminx.XMLAssert.SettingsSaveContext;
 import org.eclipse.lemminx.commons.BadLocationException;
+import org.eclipse.lemminx.commons.DiagnosticUtils;
 import org.eclipse.lemminx.commons.TextDocument;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMParser;
@@ -46,8 +47,10 @@ import org.eclipse.lsp4j.CodeActionContext;
 import org.eclipse.lsp4j.Command;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticRelatedInformation;
+import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -263,7 +266,7 @@ public class MavenCodeActionParticipantTest {
 	public static void assertDiagnostics(List<Diagnostic> actual, List<Diagnostic> expected, boolean filter) {
 		List<Diagnostic> received = actual;
 		final boolean filterMessage;
-		if (expected != null && !expected.isEmpty() && !StringUtils.isEmpty(expected.get(0).getMessage())) {
+		if (expected != null && !expected.isEmpty() && !StringUtils.isEmpty(DiagnosticUtils.getDiagnosticMessage(expected.get(0)))) {
 			filterMessage = true;
 		} else {
 			filterMessage = false;

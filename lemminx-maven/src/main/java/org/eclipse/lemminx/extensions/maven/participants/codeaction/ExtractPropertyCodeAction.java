@@ -52,6 +52,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.ResourceOperation;
+import org.eclipse.lsp4j.SnippetTextEdit;
 import org.eclipse.lsp4j.TextDocumentEdit;
 import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
@@ -407,9 +408,12 @@ public class ExtractPropertyCodeAction implements ICodeActionParticipant {
 	}
 	
 	private static TextDocumentEdit createProjectTextDocumentEdit(TextDocument textDocument, List<TextEdit> projectTextEdits) {
-		VersionedTextDocumentIdentifier projectVersionedTextDocumentIdentifier = 
+		VersionedTextDocumentIdentifier projectVersionedTextDocumentIdentifier =
 				new VersionedTextDocumentIdentifier(textDocument.getUri(), textDocument.getVersion());
-		return new TextDocumentEdit(projectVersionedTextDocumentIdentifier, projectTextEdits);
+		List<Either<TextEdit, SnippetTextEdit>> edits = projectTextEdits.stream()
+				.map(Either::<TextEdit, SnippetTextEdit>forLeft)
+				.toList();
+		return new TextDocumentEdit(projectVersionedTextDocumentIdentifier, edits);
 	}
 	
 	private static CodeAction createReplaceCodeActione(String title, List<TextDocumentEdit> replace, Diagnostic diagnostic) {

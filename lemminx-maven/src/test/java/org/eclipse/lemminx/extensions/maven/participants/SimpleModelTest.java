@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import org.eclipse.lemminx.commons.DiagnosticUtils;
 import org.eclipse.lemminx.commons.TextDocument;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMNode;
@@ -48,17 +49,17 @@ import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
+import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.DidChangeWorkspaceFoldersParams;
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.LocationLink;
-import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.WorkspaceFolder;
-import org.eclipse.lsp4j.WorkspaceFoldersChangeEvent;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.WorkspaceFoldersChangeEvent;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -147,7 +148,7 @@ public class SimpleModelTest {
 		languageService.didOpen(document);
 		
 		List<Diagnostic> diagnostics = languageService.doDiagnostics(document, new XMLValidationSettings(), Map.of(), () -> {});
-		assertFalse(diagnostics.stream().anyMatch(diag -> diag.getMessage().contains("Non-parseable POM")));
+		assertFalse(diagnostics.stream().anyMatch(diag -> DiagnosticUtils.getDiagnosticMessage(diag).contains("Non-parseable POM")));
 	}
 
 	@Test
@@ -158,7 +159,7 @@ public class SimpleModelTest {
 
 		List<Diagnostic>diagnostics = languageService.doDiagnostics(document, new XMLValidationSettings(), Map.of(), () -> {});
 		System.out.println(diagnostics);
-		assertTrue(diagnostics.stream().map(Diagnostic::getMessage)
+		assertTrue(diagnostics.stream().map(diag->DiagnosticUtils.getDiagnosticMessage(diag))
 				.anyMatch(message -> message.contains("artifactId")));
 		// simulate an edit
 		TextDocument textDocument = document.getTextDocument();
@@ -177,7 +178,7 @@ public class SimpleModelTest {
 		languageService.didOpen(document);
 		
 		List<Diagnostic> diagnostics = languageService.doDiagnostics(document, new XMLValidationSettings(), Map.of(), () -> {});
-		assertFalse(diagnostics.stream().anyMatch(diag -> diag.getMessage().contains("${env")));
+		assertFalse(diagnostics.stream().anyMatch(diag -> DiagnosticUtils.getDiagnosticMessage(diag).contains("${env")));
 	}
 
 	@Test
@@ -367,7 +368,10 @@ public class SimpleModelTest {
 		List<Diagnostic> diagnosticsA = languageService.doDiagnostics(
 				documentA, new XMLValidationSettings(), Map.of(), () -> {});
 		assertFalse(diagnosticsA.stream()
-				.anyMatch(diag -> (diag.getMessage().contains("ModuleA") || diag.getMessage().contains("ModuleB"))));
+				.anyMatch(diag -> {
+					String msg = DiagnosticUtils.getDiagnosticMessage(diag);
+					return msg.contains("ModuleA") || msg.contains("ModuleB");
+				}));
 
 		DOMDocument documentB = createDOMDocument("/modules/dependent/module-b-pom.xml", languageService);
 		languageService.didOpen(documentB);
@@ -403,14 +407,14 @@ public class SimpleModelTest {
 		
 		List<Diagnostic> diagnosticsA = languageService.doDiagnostics(
 				documentA, new XMLValidationSettings(), Map.of(), () -> {});
-		assertFalse(diagnosticsA.stream().anyMatch(diag -> (diag.getMessage().contains("ModuleA") || diag.getMessage().contains("ModuleB"))));
+		assertFalse(diagnosticsA.stream().anyMatch(diag -> (DiagnosticUtils.getDiagnosticMessage(diag).contains("ModuleA") || DiagnosticUtils.getDiagnosticMessage(diag).contains("ModuleB"))));
 
 		DOMDocument documentB = createDOMDocument("/modules/dependent/module-b-pom.xml", languageService);
 		languageService.didOpen(documentB);
 		
 		List<Diagnostic> diagnosticsB = languageService.doDiagnostics(
 				documentB, new XMLValidationSettings(), Map.of(), () -> {});
-		assertFalse(diagnosticsB.stream().anyMatch(diag -> (diag.getMessage().contains("ModuleA") || diag.getMessage().contains("ModuleB"))));
+		assertFalse(diagnosticsB.stream().anyMatch(diag -> (DiagnosticUtils.getDiagnosticMessage(diag).contains("ModuleA") || DiagnosticUtils.getDiagnosticMessage(diag).contains("ModuleB"))));
 
 		// The items collected from Workspace as well as from Maven Search API cannot be 
 		// immediately obtained due to the "lazy: loading, so, we need to wait until all 
@@ -476,14 +480,14 @@ public class SimpleModelTest {
 
 		List<Diagnostic> diagnosticsA = languageService.doDiagnostics(
 				documentA, new XMLValidationSettings(), Map.of(), () -> {});
-		assertFalse(diagnosticsA.stream().anyMatch(diag -> (diag.getMessage().contains("ModuleA") || diag.getMessage().contains("ModuleB"))));
+		assertFalse(diagnosticsA.stream().anyMatch(diag -> (DiagnosticUtils.getDiagnosticMessage(diag).contains("ModuleA") || DiagnosticUtils.getDiagnosticMessage(diag).contains("ModuleB"))));
 
 		DOMDocument documentC = createDOMDocument("/modules/dependent/module-c-pom.xml", languageService);
 		languageService.didOpen(documentC);
 
 		List<Diagnostic> diagnosticsC = languageService.doDiagnostics(
 				documentC, new XMLValidationSettings(), Map.of(), () -> {});
-		assertFalse(diagnosticsC.stream().anyMatch(diag -> (diag.getMessage().contains("ModuleA") || diag.getMessage().contains("ModuleB"))));
+		assertFalse(diagnosticsC.stream().anyMatch(diag -> (DiagnosticUtils.getDiagnosticMessage(diag).contains("ModuleA") || DiagnosticUtils.getDiagnosticMessage(diag).contains("ModuleB"))));
 
 		// in <parent />
 		// for group ID
@@ -741,7 +745,7 @@ public class SimpleModelTest {
 		// 'dependencies.dependency.systemPath' for a:a:jar must specify an absolute
 		// path but is ${basedir}
 		assertTrue(
-				diagnostics.stream().anyMatch(diag -> (diag.getMessage().contains("dependencies.dependency.systemPath")
+				diagnostics.stream().anyMatch(diag -> (DiagnosticUtils.getDiagnosticMessage(diag).contains("dependencies.dependency.systemPath")
 						&& r(14, 17, 14, 27).equals(diag.getRange()))));
 		languageService.dispose();
 	}
