@@ -10,7 +10,7 @@ package org.eclipse.lemminx.extensions.maven.participants.rename;
 
 import static org.eclipse.lemminx.extensions.maven.DOMConstants.PROPERTIES_ELT;
 import static org.eclipse.lemminx.extensions.maven.utils.MavenLemminxTestsUtils.createDOMDocument;
-import static org.eclipse.lemminx.utils.TextEditUtils.creatTextDocumentEdit;
+import static org.eclipse.lemminx.utils.DOMTextEditUtils.creatTextDocumentEdit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
