@@ -159,7 +159,7 @@ public class SimpleModelTest {
 
 		List<Diagnostic>diagnostics = languageService.doDiagnostics(document, new XMLValidationSettings(), Map.of(), () -> {});
 		System.out.println(diagnostics);
-		assertTrue(diagnostics.stream().map(diag->DiagnosticUtils.getDiagnosticMessage(diag))
+		assertTrue(diagnostics.stream().map(DiagnosticUtils::getDiagnosticMessage)
 				.anyMatch(message -> message.contains("artifactId")));
 		// simulate an edit
 		TextDocument textDocument = document.getTextDocument();

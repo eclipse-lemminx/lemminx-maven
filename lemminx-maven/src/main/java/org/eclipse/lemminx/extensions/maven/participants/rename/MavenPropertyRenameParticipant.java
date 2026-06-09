@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 Red Hat Inc. and others.
+ * Copyright (c) 2023, 2026 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.lemminx.commons.BadLocationException;
 import org.eclipse.lemminx.commons.TextDocument;
+import org.eclipse.lemminx.commons.TextEditUtils;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMElement;
 import org.eclipse.lemminx.dom.DOMNode;
@@ -173,9 +174,7 @@ public class MavenPropertyRenameParticipant implements IRenameParticipant {
 				collectPropertyUseTextEdits(projectDocumentt.getDocumentElement(), oldPropertyName, newPropertyName, projectTextEdits, cancelChecker);
 				VersionedTextDocumentIdentifier projectVersionedTextDocumentIdentifier = new VersionedTextDocumentIdentifier(
 						projectDocumentt.getTextDocument().getUri(), projectDocumentt.getTextDocument().getVersion());
-				List<Either<TextEdit, SnippetTextEdit>> edits = projectTextEdits.stream()
-						.map(Either::<TextEdit, SnippetTextEdit>forLeft)
-						.toList();
+				List<Either<TextEdit, SnippetTextEdit>> edits = TextEditUtils.toEitherTextEdits(projectTextEdits);
 				renameResponse.addTextDocumentEdit(new TextDocumentEdit(projectVersionedTextDocumentIdentifier, edits));
 			});
 		} catch (MavenInitializationException | MavenModelOutOfDatedException e) {
