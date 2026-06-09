@@ -40,6 +40,7 @@ import org.eclipse.lemminx.services.extensions.rename.IRenameRequest;
 import org.eclipse.lemminx.services.extensions.rename.IRenameResponse;
 import org.eclipse.lsp4j.PrepareRenameResult;
 import org.eclipse.lsp4j.Range;
+import org.eclipse.lsp4j.SnippetTextEdit;
 import org.eclipse.lsp4j.TextDocumentEdit;
 import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier;
@@ -172,7 +173,10 @@ public class MavenPropertyRenameParticipant implements IRenameParticipant {
 				collectPropertyUseTextEdits(projectDocumentt.getDocumentElement(), oldPropertyName, newPropertyName, projectTextEdits, cancelChecker);
 				VersionedTextDocumentIdentifier projectVersionedTextDocumentIdentifier = new VersionedTextDocumentIdentifier(
 						projectDocumentt.getTextDocument().getUri(), projectDocumentt.getTextDocument().getVersion());
-				renameResponse.addTextDocumentEdit(new TextDocumentEdit(projectVersionedTextDocumentIdentifier, projectTextEdits));		
+				List<Either<TextEdit, SnippetTextEdit>> edits = projectTextEdits.stream()
+						.map(Either::<TextEdit, SnippetTextEdit>forLeft)
+						.toList();
+				renameResponse.addTextDocumentEdit(new TextDocumentEdit(projectVersionedTextDocumentIdentifier, edits));
 			});
 		} catch (MavenInitializationException | MavenModelOutOfDatedException e) {
 			// - Maven is initializing

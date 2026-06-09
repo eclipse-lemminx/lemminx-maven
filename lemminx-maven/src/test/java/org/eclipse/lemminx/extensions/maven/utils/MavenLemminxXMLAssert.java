@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.lemminx.XMLAssert.SettingsSaveContext;
 import org.eclipse.lemminx.commons.BadLocationException;
+import org.eclipse.lemminx.commons.DiagnosticUtils;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.extensions.contentmodel.settings.ContentModelSettings;
 import org.eclipse.lemminx.services.XMLLanguageService;
@@ -46,7 +47,7 @@ public class MavenLemminxXMLAssert {
 	public static void assertDiagnostics(List<Diagnostic> actual, List<Diagnostic> expected, boolean filter) {
 		List<Diagnostic> received = actual;
 		final boolean filterMessage;
-		if (expected != null && !expected.isEmpty() && !StringUtils.isEmpty(expected.get(0).getMessage())) {
+		if (expected != null && !expected.isEmpty() && !StringUtils.isEmpty(DiagnosticUtils.getDiagnosticMessage(expected.get(0)))) {
 			filterMessage = true;
 		} else {
 			filterMessage = false;
