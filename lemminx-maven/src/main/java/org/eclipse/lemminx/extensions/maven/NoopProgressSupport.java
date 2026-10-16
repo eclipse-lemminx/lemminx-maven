@@ -33,7 +33,8 @@ public final class NoopProgressSupport implements ProgressSupport {
 
 	@Override
 	public CompletableFuture<Void> createProgress(WorkDoneProgressCreateParams params) {
-		return null;
+		// or CompletableFuture.supplyAsync(() -> null)
+		return CompletableFuture.completedFuture(null);
 	}
 
 	@Override
