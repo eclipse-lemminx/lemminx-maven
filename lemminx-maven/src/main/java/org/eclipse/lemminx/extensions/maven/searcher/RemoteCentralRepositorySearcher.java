@@ -94,11 +94,11 @@ public class RemoteCentralRepositorySearcher {
 
 	private final Cache<RequestKey, CompletableFuture<?>> cache;
 
-	private final CacheManager<RequestKey, Collection<Artifact>> artifactsCache;
+	private final CacheManager<Collection<Artifact>> artifactsCache;
 
-	private final CacheManager<RequestKey, Collection<String>> groupIdsCache;
+	private final CacheManager<Collection<String>> groupIdsCache;
 
-	private final CacheManager<RequestKey, Collection<ArtifactVersion>> artifactVersionsCache;
+	private final CacheManager<Collection<ArtifactVersion>> artifactVersionsCache;
 
 	private enum RequestKind {
 		KIND_GET_GROUP_IDS("Get Group IDs"), //
@@ -189,7 +189,7 @@ public class RemoteCentralRepositorySearcher {
 		}
 	}
 
-	private class CacheManager<RequeatKey, V> {
+	private class CacheManager<V> {
 
 		private final Cache<RequestKey, CompletableFuture<?>> cache;
 
@@ -247,9 +247,9 @@ public class RemoteCentralRepositorySearcher {
 		this.cache = CacheBuilder.newBuilder() //
 				.expireAfterWrite(DEFAULT_CACHE_EXPIRATION_TIMEOUT, TimeUnit.MINUTES)//
 				.build();
-		this.artifactsCache = new CacheManager<RemoteCentralRepositorySearcher.RequestKey, Collection<Artifact>>(cache);
-		this.groupIdsCache = new CacheManager<RemoteCentralRepositorySearcher.RequestKey, Collection<String>>(cache);
-		this.artifactVersionsCache = new CacheManager<RemoteCentralRepositorySearcher.RequestKey, Collection<ArtifactVersion>>(
+		this.artifactsCache = new CacheManager<Collection<Artifact>>(cache);
+		this.groupIdsCache = new CacheManager<Collection<String>>(cache);
+		this.artifactVersionsCache = new CacheManager<Collection<ArtifactVersion>>(
 				cache);
 	}
 
