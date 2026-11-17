@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2023 Red Hat Inc. and others.
+ * Copyright (c) 2019, 2026 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -359,14 +359,6 @@ public class LocalRepositorySearcher implements IMavenProjectBuildListener {
 						.map(future -> future.getNow(null))
 						.filter(Objects::nonNull)
 						.flatMap(list -> list.stream())
-						.toList());
-	}
-
-	private static <T> CompletableFuture<Collection<T>> joinAllOf(Collection<CompletableFuture<Collection<T>>> futures) {
-		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])) //
-				.thenApply(__ -> futures.stream() //
-						.map(CompletableFuture::join) //
-						.flatMap(list -> list.stream()) //
 						.toList());
 	}
 
