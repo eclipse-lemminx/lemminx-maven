@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.maven.project.MavenProject;
+import org.eclipse.lemminx.commons.DiagnosticUtils;
 import org.eclipse.lemminx.commons.TextDocument;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.extensions.contentmodel.settings.XMLValidationSettings;
@@ -36,8 +37,10 @@ import org.eclipse.lemminx.extensions.maven.NoMavenCentralExtension;
 import org.eclipse.lemminx.services.extensions.IWorkspaceServiceParticipant;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DidChangeWorkspaceFoldersParams;
+import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.WorkspaceFolder;
 import org.eclipse.lsp4j.WorkspaceFoldersChangeEvent;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -135,7 +138,7 @@ public class MavenProjectCacheTest {
 		languageService.didOpen(doc);
 
 		List<Diagnostic> diagnostics = languageService.doDiagnostics(doc, new XMLValidationSettings(), Map.of(), () -> {});
-		assertFalse(diagnostics.stream().anyMatch(diag -> (diag.getMessage().contains("ModuleA"))));
+		assertFalse(diagnostics.stream().anyMatch(diag -> (DiagnosticUtils.getDiagnosticMessage(diag)).contains("ModuleA")));
 	}
 	
 //	@Test
@@ -168,7 +171,7 @@ public class MavenProjectCacheTest {
 		languageService.didOpen(doc);
 
 		List<Diagnostic> diagnostics = languageService.doDiagnostics(doc, new XMLValidationSettings(), Map.of(), () -> {});
-		assertTrue(diagnostics.stream().anyMatch(diag -> (diag.getMessage().contains("ModuleA"))));
+		assertTrue(diagnostics.stream().anyMatch(diag -> (DiagnosticUtils.getDiagnosticMessage(diag)).contains("ModuleA")));
 	}
 	
 	@Test

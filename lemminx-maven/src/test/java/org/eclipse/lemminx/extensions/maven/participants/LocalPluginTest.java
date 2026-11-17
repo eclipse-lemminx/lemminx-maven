@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.lemminx.commons.DiagnosticUtils;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.extensions.contentmodel.settings.XMLValidationSettings;
 import org.eclipse.lemminx.extensions.maven.MavenLanguageService;
@@ -34,6 +35,7 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.HoverCapabilities;
 import org.eclipse.lsp4j.LocationLink;
+import org.eclipse.lsp4j.MarkupContent;
 import org.eclipse.lsp4j.MarkupKind;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
@@ -243,7 +245,8 @@ public class LocalPluginTest {
 	@Timeout(30000)
 	public void testPluginConfigurationDiagnostics() throws IOException, InterruptedException, ExecutionException, URISyntaxException {
 		DOMDocument document = createDOMDocument("/pom-plugin-configuration-diagnostic.xml", languageService);
-		assertTrue(languageService.doDiagnostics(document, new XMLValidationSettings(), Map.of(), () -> {}).stream().map(Diagnostic::getMessage)
+		assertTrue(languageService.doDiagnostics(document, new XMLValidationSettings(), Map.of(), () -> {
+				}).stream().map(diag -> DiagnosticUtils.getDiagnosticMessage(diag))
 				.anyMatch(message -> message.contains("Invalid plugin configuration")));
 		assertTrue(languageService.doDiagnostics(document, new XMLValidationSettings(), Map.of(), () -> {}).size() == 2);
 	}
@@ -251,7 +254,8 @@ public class LocalPluginTest {
 	@Test
 	public void testPluginGoalDiagnostics() throws IOException, InterruptedException, ExecutionException, URISyntaxException {
 		DOMDocument document = createDOMDocument("/pom-plugin-goal-diagnostic.xml", languageService);
-		assertTrue(languageService.doDiagnostics(document, new XMLValidationSettings(), Map.of(), () -> {}).stream().map(Diagnostic::getMessage)
+		assertTrue(languageService.doDiagnostics(document, new XMLValidationSettings(), Map.of(), () -> {
+				}).stream().map(diag -> DiagnosticUtils.getDiagnosticMessage(diag))
 				.anyMatch(message -> message.contains("Invalid goal for this plugin")));
 		assertTrue(languageService.doDiagnostics(document, new XMLValidationSettings(), Map.of(), () -> {}).size() == 2);
 	}
