@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2023 Red Hat Inc. and others.
+ * Copyright (c) 2022, 2026 Red Hat Inc. and others.
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -193,24 +193,23 @@ public class ParticipantUtils {
 	}
 
 	public static List<RemoteRepository> getRemoteRepositories(MavenProject pproject, DOMElement element) {
-        List<RemoteRepository> remoteRepositories = new ArrayList<RemoteRepository>();
-        remoteRepositories.add(RemoteCentralRepositorySearcher.CENTRAL_REPO);
-		if (isPlugin(element)) {
-			pproject.getRemotePluginRepositories().stream().forEach(r -> {
-				if (!remoteRepositories.contains(r)) {
-					remoteRepositories.add(r);
-				}
-			});
-			
-		} else if (isDependency(element)) {
-			pproject.getRemoteArtifactRepositories().stream().forEach(ar -> {
-				RemoteRepository r = new RemoteRepository.Builder(ar.getId(), "default", ar.getUrl()).build();
-				if (!remoteRepositories.contains(r)) {
-					remoteRepositories.add(r);
-				}
-			});
+		List<RemoteRepository> remoteRepositories = new ArrayList<RemoteRepository>(
+				isPlugin(element) ? pproject.getRemotePluginRepositories()
+						: isDependency(element) ? pproject.getRemoteProjectRepositories() : List.of());
+		// Keep a central repository configured by the project (e.g. with an internal URL
+		// or other policies) or a mirror of it, and add the default one only if there is
+		// none. Compare by id, RemoteRepository.equals() also compares the URL and the
+		// policies.
+		String centralId = RemoteCentralRepositorySearcher.CENTRAL_REPO.getId();
+		if (remoteRepositories.stream().noneMatch(r -> servesRepository(r, centralId))) {
+			remoteRepositories.add(0, RemoteCentralRepositorySearcher.CENTRAL_REPO);
 		}
 		return remoteRepositories;
+	}
+
+	private static boolean servesRepository(RemoteRepository repository, String id) {
+		return id.equals(repository.getId())
+				|| repository.getMirroredRepositories().stream().anyMatch(mirrored -> id.equals(mirrored.getId()));
 	}
 	
 	public static boolean isDependency(DOMElement element) {
