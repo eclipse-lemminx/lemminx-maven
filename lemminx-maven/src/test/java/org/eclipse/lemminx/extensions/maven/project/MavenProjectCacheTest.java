@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019-2023 Red Hat Inc. and others.
+ * Copyright (c) 2019-2026 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.lemminx.commons.TextDocument;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.extensions.contentmodel.settings.XMLValidationSettings;
@@ -83,6 +85,30 @@ public class MavenProjectCacheTest {
 		MavenProjectCache cache = plugin.getProjectCache();
 		MavenProject project = cache.getLastSuccessfulMavenProject(doc);
 		assertNotNull(project);
+	}
+
+	@Test
+	public void testOnBuildError_MinimalProjectKeepsRepositoryPolicies() throws Exception {
+		MavenLemminxExtension plugin = new MavenLemminxExtension();
+		plugin.start(null,languageService);
+
+		URI uri = getClass().getResource("/pom-with-repositories-and-build-error.xml").toURI();
+		String content = Files.readString(new File(uri).toPath(), StandardCharsets.UTF_8);
+		DOMDocument doc = new DOMDocument(new TextDocument(content, uri.toString()), null);
+		languageService.didOpen(doc);
+
+		MavenProject project = plugin.getProjectCache().getLastSuccessfulMavenProject(doc);
+		assertNotNull(project);
+
+		// The invalid repository is skipped. A fully built project would also have
+		// central from the super-POM, so this also checks the minimal project is used.
+		List<RemoteRepository> repositories = project.getRemoteProjectRepositories();
+		assertEquals(List.of("valid-repo"), repositories.stream().map(RemoteRepository::getId).toList());
+
+		RemoteRepository repository = repositories.get(0);
+		assertTrue(repository.getPolicy(false).isEnabled());
+		assertEquals(RepositoryPolicy.UPDATE_POLICY_NEVER, repository.getPolicy(false).getUpdatePolicy());
+		assertFalse(repository.getPolicy(true).isEnabled());
 	}
 
 	@Test

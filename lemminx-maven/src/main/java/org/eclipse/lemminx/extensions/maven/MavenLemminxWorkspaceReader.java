@@ -35,9 +35,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.MavenArtifactRepository;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.FileModelSource;
@@ -139,17 +136,9 @@ public class MavenLemminxWorkspaceReader implements WorkspaceReader {
 			// errors and to have something usable in cache for most basic operations
 			try (InputStream documentStream = new FileModelSource(file).getInputStream()) {
 				Model model = mavenReader.read(documentStream);
+				// Only the coordinates and the file of this project are used, so there is no
+				// need to set up its remote repositories
 				MavenProject project = new MavenProject(model);
-				project.setRemoteArtifactRepositories(model.getRepositories().stream()
-						.map(repo -> new MavenArtifactRepository(repo.getId(), repo.getUrl(),
-								new DefaultRepositoryLayout(),
-								new ArtifactRepositoryPolicy(true,
-										ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL,
-										ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN),
-								new ArtifactRepositoryPolicy(true,
-										ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL,
-										ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN)))
-						.distinct().collect(Collectors.toList()));
 				project.setFile(file);
 				project.setBuild(new Build());
 				return Optional.of(project);

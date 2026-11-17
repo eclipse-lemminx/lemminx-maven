@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2023 Red Hat Inc. and others.
+ * Copyright (c) 2020, 2026 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -42,9 +42,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.MavenArtifactRepository;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.cli.CLIManager;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
@@ -119,6 +118,7 @@ public class MavenProjectCache {
 		private final ThreadPoolExecutor executor = new ThreadPoolExecutor(0, 1, 0, TimeUnit.MILLISECONDS, runnables);
 		private final MavenXpp3Reader mavenReader = new MavenXpp3Reader();
 		private ProjectBuilder projectBuilder;
+		private MavenRepositorySystem repositorySystem;
 
 		private final class BuildProjectRunnable implements Runnable {
 			final String uri;
@@ -199,16 +199,17 @@ public class MavenProjectCache {
 								Model model = mavenReader.read(documentStream);
 								cancelChecker.checkCanceled();
 								project = new MavenProject(model);
-								project.setRemoteArtifactRepositories(model.getRepositories().stream()
-										.map(repo -> new MavenArtifactRepository(repo.getId(), repo.getUrl(),
-												new DefaultRepositoryLayout(),
-												new ArtifactRepositoryPolicy(true,
-														ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL,
-														ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN),
-												new ArtifactRepositoryPolicy(true,
-														ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL,
-														ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN)))
-										.distinct().collect(Collectors.toList()));
+								if (repositorySystem != null) {
+									project.setRemoteArtifactRepositories(model.getRepositories().stream()
+											.map(repo -> {
+												try {
+													return repositorySystem.buildArtifactRepositoryFromRepo(repo);
+												} catch (InvalidRepositoryException ex) {
+													LOGGER.log(Level.FINER, ex.getMessage(), ex);
+													return null;
+												}
+											}).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
+								}
 								project.setFile(file);
 								project.setBuild(new Build());
 							} catch (XmlPullParserException | EOFException parserException) {
@@ -272,6 +273,7 @@ public class MavenProjectCache {
 			}
 			try {
 				projectBuilder = getPlexusContainer().lookup(ProjectBuilder.class);
+				repositorySystem = getPlexusContainer().lookup(MavenRepositorySystem.class);
 				System.setProperty(DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY,
 						Boolean.toString(true));
 			} catch (ComponentLookupException e) {
