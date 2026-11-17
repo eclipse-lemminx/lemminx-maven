@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 Red Hat Inc. and others.
+ * Copyright (c) 2023, 2026 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.eclipse.lemminx.extensions.maven.settings.XMLMavenSettings;
 
 /**
@@ -115,7 +115,7 @@ public class LocalRepositoryUtils {
 			return defaultLocalRepositoryPath;
 		}
 		// 3) Returns the default local repository ${userName}/.m2/repository
-		return RepositorySystem.defaultUserLocalRepository;
+		return new File(SettingsXmlConfigurationProcessor.USER_MAVEN_CONFIGURATION_HOME, "repository");
 	}
 
 }
