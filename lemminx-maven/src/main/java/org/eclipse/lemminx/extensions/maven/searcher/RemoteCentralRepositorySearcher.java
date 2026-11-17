@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2023 Red Hat Inc. and others.
+ * Copyright (c) 2022, 2026 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -32,6 +32,7 @@ import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.net.http.HttpTimeoutException;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -79,8 +80,11 @@ public class RemoteCentralRepositorySearcher {
 			System.getProperty(RemoteCentralRepositorySearcher.class.getName() + ".disableCentralSearch"));
 
 	private final static long DEFAULT_CACHE_EXPIRATION_TIMEOUT = 30L; // Minutes
-	private final static long DEFAULT_CONNECT_TIMEOUT = 30; // Seconds
-	private final static long DEFAULT_REQUEST_TIMEOUT = 60; // Seconds 
+	private final static long DEFAULT_CONNECT_TIMEOUT = 5; // Seconds
+	// search.maven.org either answers within a second or (occasionally) never
+	// answers at all, so give up quickly and retry instead of waiting long
+	private final static long DEFAULT_REQUEST_TIMEOUT = 5; // Seconds
+	private final static int MAX_REQUEST_ATTEMPTS = 3;
 
 	private final static String HEADER_USERAGENT = "User-Agent";
 	
@@ -479,6 +483,19 @@ public class RemoteCentralRepositorySearcher {
 		return url.toString();
 	}
 
+	private HttpResponse<String> sendWithRetry(HttpRequest request) throws IOException, InterruptedException {
+		for (int attempt = 1;; attempt++) {
+			try {
+				return client.send(request, BodyHandlers.ofString());
+			} catch (HttpTimeoutException e) {
+				if (attempt >= MAX_REQUEST_ATTEMPTS) {
+					throw e;
+				}
+				LOGGER.log(Level.FINE, "Maven Central Repo search timed out, retrying: " + request.uri());
+			}
+		}
+	}
+
 	private JsonObject getResponseBody(String url, Dependency artifactToSearch) throws Exception {
 		try {
 			HttpRequest request = HttpRequest.newBuilder()
@@ -488,7 +505,7 @@ public class RemoteCentralRepositorySearcher {
 					.GET()
 					.build();
 			
-			HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+			HttpResponse<String> response = sendWithRetry(request);
 			if (isSuccessful(response)) {
 				JsonObject bodyObject = JsonParser.parseString(response.body()).getAsJsonObject();
 				if (bodyObject.has(RESPONSE)) {
