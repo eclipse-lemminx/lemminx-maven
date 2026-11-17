@@ -4,7 +4,7 @@ pipeline{
 		buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '2'))
 	}
 	tools {
-		jdk 'openjdk-jdk17-latest'
+		jdk 'temurin-jdk17-latest'
 	}
 	environment {
 		MAVEN_HOME = "$WORKSPACE/.m2/"
