@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021-2022 Red Hat Inc. and others.
+ * Copyright (c) 2021-2026 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -8,9 +8,9 @@
  *******************************************************************************/
 package org.eclipse.lemminx.extensions.maven;
 
+import static org.eclipse.lemminx.extensions.maven.utils.LocalRepositoryUtils.MAVEN_LOCAL_REPO_PROPERTY_NAME;
 import static org.eclipse.lemminx.extensions.maven.utils.LocalRepositoryUtils.getLocalRepositoryPaths;
 import static org.eclipse.lemminx.extensions.maven.utils.LocalRepositoryUtils.getTempLocalRepositoryPath;
-import static org.eclipse.lemminx.extensions.maven.utils.LocalRepositoryUtils.MAVEN_LOCAL_REPO_PROPERTY_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.eclipse.aether.RepositorySystemSession;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
