@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2023 Red Hat Inc. and others.
+ * Copyright (c) 2020, 2026 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -44,7 +44,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.maven.Maven;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -59,7 +58,6 @@ import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
@@ -411,15 +409,9 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 
 		LocalRepositoryUtils.updateLocalRepositoryPath(mavenRequest, options);
 
-		RepositorySystem repositorySystem = container.lookup(RepositorySystem.class);
-		ArtifactRepository localRepo = repositorySystem.createLocalRepository(mavenRequest.getLocalRepositoryPath());
-		mavenRequest.setLocalRepository(localRepo);
-		List<ArtifactRepository> defaultRemoteRepositories = Collections
-				.singletonList(repositorySystem.createDefaultRemoteRepository());
-		mavenRequest.setRemoteRepositories(
-				joinRemoteRepositories(mavenRequest.getRemoteRepositories(), defaultRemoteRepositories));
-		mavenRequest.setPluginArtifactRepositories(
-				joinRemoteRepositories(mavenRequest.getPluginArtifactRepositories(), defaultRemoteRepositories));
+		// Creates the local repository and adds Maven Central to the remote and plugin
+		// repositories, unless a repository with the "central" id is already configured
+		container.lookup(MavenExecutionRequestPopulator.class).populateDefaults(mavenRequest);
 		mavenRequest.setSystemProperties(systemProperties);
 		mavenRequest.setCacheNotFound(true);
 		mavenRequest.setCacheTransferError(true);
@@ -462,15 +454,6 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 			}
 		}
 		return systemProperties;
-	}
-
-	private List<ArtifactRepository> joinRemoteRepositories(List<ArtifactRepository> a, List<ArtifactRepository> b) {
-		if (a.isEmpty()) {
-			return b;
-		}
-		List<ArtifactRepository> remotes = new ArrayList<>(a);
-		remotes.addAll(b);
-		return remotes;
 	}
 
 	private static File getFileFromOptions(String element, File defaults) {
