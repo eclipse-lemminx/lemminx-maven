@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2023 Red Hat Inc. and others.
+ * Copyright (c) 2020, 2026 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.function.Predicate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.maven.Maven;
 import org.apache.maven.model.Dependency;
@@ -46,7 +44,6 @@ import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 
 public class MavenDefinitionParticipant implements IDefinitionParticipant {
 
-	private static final Logger LOGGER = Logger.getLogger(MavenDefinitionParticipant.class.getName());
 	private final MavenLemminxExtension plugin;
 
 	public MavenDefinitionParticipant(MavenLemminxExtension plugin) {
