@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021-2023 Red Hat Inc. and others.
+ * Copyright (c) 2021-2026 Red Hat Inc. and others.
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -61,13 +61,13 @@ public class MavenCompletionParticipantTest {
 			</project>
 			""";
 		testCompletionFor(pom, null, "file:///pom.xml", null, //
-				c("maven-core - org.apache.maven:maven-core:3.0", //
+				c("maven-core - org.apache.maven:maven-core:3.2.5", //
 				te(16, 4, 16, 14, //
 						"""
 							<dependency>
 							      <groupId>org.apache.maven</groupId>
 							      <artifactId>maven-core</artifactId>
-							      <version>3.0</version>
+							      <version>3.2.5</version>
 							    </dependency>"""),
 				"maven-core"));
 	}
@@ -101,13 +101,13 @@ public class MavenCompletionParticipantTest {
 			</project>
 			""";
 		testCompletionFor(new XMLLanguageService(), pom, null, null, "file:///pom.xml", null, settings, //
-				c("maven-core - org.apache.maven:maven-core:3.0", //
+				c("maven-core - org.apache.maven:maven-core:3.2.5", //
 				te(16, 4, 16, 14, //
 						"""
 							<dependency>
 							  <groupId>org.apache.maven</groupId>
 							  <artifactId>maven-core</artifactId>
-							  <version>3.0</version>
+							  <version>3.2.5</version>
 							</dependency>"""),
 				"maven-core"));
 	}
@@ -131,13 +131,13 @@ public class MavenCompletionParticipantTest {
 			</project>
 			""";
 		testCompletionFor(pom, null, "file:///pom.xml", null, //
-				c("maven-core - org.apache.maven:maven-core:3.0", //
+				c("maven-core - org.apache.maven:maven-core:3.2.5", //
 				te(11, 4, 11, 14, //
 						"""
 							<dependency>
 							      <groupId>org.apache.maven</groupId>
 							      <artifactId>maven-core</artifactId>
-							      <version>3.0</version>
+							      <version>3.2.5</version>
 							    </dependency>"""),
 				"maven-core"));
 	}
@@ -163,12 +163,12 @@ public class MavenCompletionParticipantTest {
 			</project>
 			""";
 		testCompletionFor(pom, null, "file:///pom.xml", null, //
-				c("maven-core - org.apache.maven:maven-core:3.0", //
+				c("maven-core - org.apache.maven:maven-core:3.2.5", //
 				te(12, 6, 12, 16, //
 						"""
 							<groupId>org.apache.maven</groupId>
 							      <artifactId>maven-core</artifactId>
-							      <version>3.0</version>"""),
+							      <version>3.2.5</version>"""),
 						"maven-core"));
 	}
 
