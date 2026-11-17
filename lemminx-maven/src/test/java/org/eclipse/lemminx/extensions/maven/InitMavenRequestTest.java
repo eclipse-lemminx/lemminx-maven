@@ -19,8 +19,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -172,6 +175,74 @@ public class InitMavenRequestTest {
 		}
 	}
 	
+	@Test
+	public void testDefaultCentralRepository() throws Exception {
+		MavenExecutionRequest mavenRequest = initMavenRequest("""
+				<?xml version="1.0" encoding="UTF-8"?>
+				<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+				</settings>
+				""");
+
+		assertEquals(List.of(MAVEN_CENTRAL_URL), centralUrls(mavenRequest.getRemoteRepositories()));
+		assertEquals(List.of(MAVEN_CENTRAL_URL), centralUrls(mavenRequest.getPluginArtifactRepositories()));
+	}
+
+	@Test
+	public void testSettingsProfileRedefiningCentralRepository() throws Exception {
+		MavenExecutionRequest mavenRequest = initMavenRequest("""
+				<?xml version="1.0" encoding="UTF-8"?>
+				<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+				  <profiles>
+				    <profile>
+				      <id>internal-central</id>
+				      <repositories>
+				        <repository>
+				          <id>central</id>
+				          <url>https://repo.example.com/central</url>
+				        </repository>
+				      </repositories>
+				      <pluginRepositories>
+				        <pluginRepository>
+				          <id>central</id>
+				          <url>https://repo.example.com/central-plugins</url>
+				        </pluginRepository>
+				      </pluginRepositories>
+				    </profile>
+				  </profiles>
+				  <activeProfiles>
+				    <activeProfile>internal-central</activeProfile>
+				  </activeProfiles>
+				</settings>
+				""");
+
+		// The redefined central repository is used and the default one isn't added
+		assertEquals(List.of("https://repo.example.com/central"),
+				centralUrls(mavenRequest.getRemoteRepositories()));
+		assertEquals(List.of("https://repo.example.com/central-plugins"),
+				centralUrls(mavenRequest.getPluginArtifactRepositories()));
+	}
+
+	private static final String MAVEN_CENTRAL_URL = "https://repo.maven.apache.org/maven2";
+
+	private static MavenExecutionRequest initMavenRequest(String settingsXml) throws IOException {
+		File settingsFile = File.createTempFile(InitMavenRequestTest.class.getSimpleName(), "-settings.xml");
+		try {
+			Files.writeString(settingsFile.toPath(), settingsXml);
+			MavenLemminxExtension plugin = new MavenLemminxExtension();
+			plugin.settings.setGlobalSettings(null);
+			plugin.settings.setUserSettings(settingsFile.getAbsolutePath());
+			return plugin.getMavenSession().getRequest();
+		} finally {
+			settingsFile.delete();
+		}
+	}
+
+	@SuppressWarnings("deprecation") // MavenExecutionRequest only exposes the legacy ArtifactRepository
+	private static List<String> centralUrls(List<ArtifactRepository> repositories) {
+		return repositories.stream().filter(repository -> "central".equals(repository.getId()))
+				.map(ArtifactRepository::getUrl).toList();
+	}
+
 	private static boolean isWindows() {
 		return System.getProperty("os.name", "").toLowerCase().contains("windows");
 	}
