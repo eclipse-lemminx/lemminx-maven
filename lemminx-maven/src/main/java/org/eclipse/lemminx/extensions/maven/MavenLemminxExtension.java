@@ -250,18 +250,16 @@ public class MavenLemminxExtension implements IXMLExtension, IMavenProjectBuildL
 		// We do this initialization on background to avoid breaking the XML syntax
 		// validation, XML based onXSD, XML completion based on XSD
 		// while Maven component is initializing.
-		if (mavenInitializer == null) {
-			if (isUnitTestMode()) {
-				mavenInitializer = new CompletableFuture<>();
-				doInitialize(() -> {
-				});
-				mavenInitializer.complete(null);
-			} else
-				mavenInitializer = CompletableFutures.computeAsync(cancelChecker -> {
-					doInitialize(cancelChecker);
-					return null;
-				});
-		}
+		if (isUnitTestMode()) {
+			mavenInitializer = new CompletableFuture<>();
+			doInitialize(() -> {
+			});
+			mavenInitializer.complete(null);
+		} else
+			mavenInitializer = CompletableFutures.computeAsync(cancelChecker -> {
+				doInitialize(cancelChecker);
+				return null;
+			});
 		// Start Maven Project Cache
 		mavenInitializer.thenAccept(t -> cache.start());
 		return mavenInitializer;
