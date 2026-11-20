@@ -172,6 +172,7 @@
 						<goals><goal>run</goal></goals>
 						<phase>generate-test-resources</phase>
 						<configuration>
+							<skipInvocation>${skipTests}</skipInvocation>
 							<goals><goal>org.apache.maven.plugins:maven-dependency-plugin:3.11.0:go-offline</goal></goals>
 							<localRepositoryPath>${project.build.directory}/testlocalrepo</localRepositoryPath>
 							<pom>src/test/resources/pom-localrepo-test-dependencies.xml</pom>
