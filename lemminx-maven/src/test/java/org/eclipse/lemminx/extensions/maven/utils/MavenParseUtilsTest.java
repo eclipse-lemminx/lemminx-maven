@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.apache.maven.Maven;
 import org.eclipse.lemminx.commons.TextDocument;
 import org.eclipse.lemminx.dom.DOMDocument;
+import org.eclipse.lemminx.dom.DOMNode;
 import org.eclipse.lemminx.dom.DOMParser;
 import org.eclipse.lemminx.extensions.maven.NoMavenCentralExtension;
 import org.junit.jupiter.api.Test;
@@ -26,8 +27,8 @@ public class MavenParseUtilsTest {
 		DOMDocument document = DOMParser.getInstance().parse(new TextDocument(
 				"<blah><groupId>aGroupId</groupId><artifactId>anArtifactId</artifactId><version>aVersion</version></blah>",
 				Maven.POMv4), null);
-		assertEquals("anArtifactId", MavenParseUtils.parseArtifact(document.getRoots().get(0)).getArtifactId());
-		assertEquals("anArtifactId",
-				MavenParseUtils.parseArtifact(document.getRoots().get(0).getChild(0)).getArtifactId());
+		DOMNode root = document.getRoots().iterator().next();
+		assertEquals("anArtifactId", MavenParseUtils.parseArtifact(root).getArtifactId());
+		assertEquals("anArtifactId", MavenParseUtils.parseArtifact(root.getChild(0)).getArtifactId());
 	}
 }
