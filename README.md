@@ -22,6 +22,20 @@ Here a demo in Eclipse IDE:
 
 ![](images/LocalMavenDepCompletion.gif)
 
+### Refactorings and quick fixes
+
+The following code actions are offered on pom files:
+
+- **Extract property**: replaces a value (e.g. a `<version>`) with a `${...}` reference to a new property, either in the
+  current module or in any parent pom that is part of the workspace. If a property with the same value already
+  exists, it can be reused instead. Each action also has an "all values" variant that replaces every
+  occurrence of the value in elements with the same name (e.g. all `<version>` elements) in the current pom.
+- **Inline property**: replaces a `${...}` reference (or all references) with the property's value.
+- **Remove version declaration** when the version is already managed by `dependencyManagement`/`pluginManagement`,
+  with options to ignore the warning or open the managed declaration.
+- **Remove groupId/version declaration** when it duplicates the one inherited from the parent.
+- **Add Maven XML Schema declaration** to pom files without grammar constraints.
+
 ## Consuming LemMinX Maven
 
 Get the maven artifact from the Eclipse Nexus repository
