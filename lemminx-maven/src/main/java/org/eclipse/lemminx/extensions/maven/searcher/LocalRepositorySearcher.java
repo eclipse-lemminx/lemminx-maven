@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -39,6 +40,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.lemminx.commons.progress.ProgressMonitor;
 import org.eclipse.lemminx.commons.progress.ProgressSupport;
 import org.eclipse.lemminx.extensions.maven.MavenLemminxExtension;
+import org.eclipse.lemminx.extensions.maven.NoopProgressSupport;
 import org.eclipse.lemminx.extensions.maven.project.IMavenProjectBuildListener;
 import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 import org.eclipse.lsp4j.jsonrpc.CompletableFutures;
@@ -188,34 +190,26 @@ public class LocalRepositorySearcher implements IMavenProjectBuildListener {
 			}
 			
 			void begin() {
-				if (monitor == null) {
-					monitor = progressSupport != null ? progressSupport.createProgressMonitor() : null;
-					if (monitor != null) {
-						monitor.begin((initial ? "Loading" : "Updating") 
-								+ " local artifacts from ''" + repository.toPath() + "''...", 
-								null, 100, null);
-					}
-				}
-			}
+				monitor = Optional.ofNullable(progressSupport.createProgressMonitor()).orElse(new NoopProgressSupport().createProgressMonitor());
+				monitor.begin((initial ? "Loading" : "Updating")
+								+ " local artifacts from ''" + repository.toPath() + "''...",
+						null, 100, null);
+            }
 			
 			void report(String entry) {
 				var newCoompleted = incrementCompleted(1);
-				if (monitor != null) {
-					// Limiting report counts to 10 (one after each 10%-progress)
-					int percentage = percentage();
-					if (lastReportedPercentage < 0 || percentage >=100 
-							|| (percentage / 10 - lastReportedPercentage / 10) % 10 >= 1) {
-						monitor.report("Scanning folder ''" + entry  + "'' (" + newCoompleted + " / "
-								+ total + ")...", percentage(), null);
-						lastReportedPercentage = percentage;
-					}
+				// Limiting report counts to 10 (one after each 10%-progress)
+				int percentage = percentage();
+				if (lastReportedPercentage < 0 || percentage >= 100
+						|| (percentage / 10 - lastReportedPercentage / 10) % 10 >= 1) {
+					monitor.report("Scanning folder ''" + entry + "'' (" + newCoompleted + " / "
+							+ total + ")...", percentage(), null);
+					lastReportedPercentage = percentage;
 				}
-			}
-			
+            }
+
 			void end() {
-				if (monitor != null) {
-					monitor.end("Finished loading local artifacts from ''" + repository.toPath() + "''.");
-				}
+				monitor.end("Finished loading local artifacts from ''" + repository.toPath() + "''.");
 			}
 		}
 		
@@ -306,7 +300,7 @@ public class LocalRepositorySearcher implements IMavenProjectBuildListener {
 	}
 	
 	public LocalRepositorySearcher(Set<File> localRepositoryDirs, ProgressSupport progressSupport) {
-		this.progressSupport = progressSupport;
+		this.progressSupport = Objects.requireNonNull(progressSupport);
 		// Force the load of the local artifacts done in background
 		localRepositoryDirs.stream().filter(Objects::nonNull)
 			.forEach(this::createLocalLocalRepositoryCache);
